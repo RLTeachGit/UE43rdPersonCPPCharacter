@@ -68,28 +68,12 @@ void AUE43rdPersonCPPCharacter::SetupPlayerInputComponent(class UInputComponent*
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AUE43rdPersonCPPCharacter::LookUpAtRate);
 
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &AUE43rdPersonCPPCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &AUE43rdPersonCPPCharacter::TouchStopped);
-
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AUE43rdPersonCPPCharacter::OnResetVR);
 }
 
 
 void AUE43rdPersonCPPCharacter::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
-
-void AUE43rdPersonCPPCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		Jump();
-}
-
-void AUE43rdPersonCPPCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		StopJumping();
 }
 
 void AUE43rdPersonCPPCharacter::TurnAtRate(float Rate)
