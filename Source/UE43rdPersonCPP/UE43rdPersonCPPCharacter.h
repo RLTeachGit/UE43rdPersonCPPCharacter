@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "UE43rdPersonCPPCharacter.generated.h"
 
+//Forward ref
+class AUE43rdPersonCPPGameMode;
+
 UCLASS(config=Game)
 class AUE43rdPersonCPPCharacter : public ACharacter
 {
@@ -29,38 +32,40 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-protected:
-
-	/** Resets HMD orientation in VR. */
-	void OnResetVR();
-
-	/** Called for forwards/backward input */
-	void MoveForward(float Value);
-
-	/** Called for side to side input */
-	void MoveRight(float Value);
-
-	/** 
-	 * Called via input to turn at a given rate. 
-	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
-	 */
-	void TurnAtRate(float Rate);
-
-	/**
-	 * Called via input to turn look up/down at a given rate. 
-	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
-	 */
-	void LookUpAtRate(float Rate);
-
-protected:
-	// APawn interface
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	// End of APawn interface
 
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+
+
+//NEW CODE
+
+	//Deal with Possession
+protected:
+	virtual void PossessedBy(AController* Controller) override;
+	virtual void UnPossessed(void) override;
+
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+//New Variables
+public:
+
+	/** Materials in use */
+	UPROPERTY(EditDefaultsOnly, Category = PlayerColour)
+	class UMaterialInstance* NormalMaterialBody;
+
+	UPROPERTY(EditDefaultsOnly, Category = PlayerColour)
+	class UMaterialInstance* NormalMaterialChest;
+
+	UPROPERTY(EditDefaultsOnly, Category = PlayerColour)
+	class UMaterialInstance* PossessedMaterialBody;
+
+	UPROPERTY(EditDefaultsOnly, Category = PlayerColour)
+	class UMaterialInstance* PossessedMaterialChest;
+
 };
 
