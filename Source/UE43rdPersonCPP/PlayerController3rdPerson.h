@@ -23,6 +23,9 @@ class UE43RDPERSONCPP_API APlayerController3rdPerson : public APlayerController
 protected:
 	virtual void SetupInputComponent() override; //Override default
 
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 private:
 	//Action/Axis mapping
 

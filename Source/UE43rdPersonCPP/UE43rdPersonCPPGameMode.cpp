@@ -2,14 +2,13 @@
 
 #include "UE43rdPersonCPPGameMode.h"
 #include "UE43rdPersonCPPCharacter.h"
+#include "PlayerController3rdPerson.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UE43rdPersonCPPCharacter.h"
 #include "Engine/World.h"
 
 
 DECLARE_LOG_CATEGORY_EXTERN(CaptainsLog, Log, All);
-
-
 AUE43rdPersonCPPGameMode::AUE43rdPersonCPPGameMode()
 {
 	// set default pawn class to our Blueprinted character
@@ -40,6 +39,9 @@ AUE43rdPersonCPPGameMode::AUE43rdPersonCPPGameMode()
 		PlayerControllerClass = NULL; ///If we dont do this it will contain rubbish and crash
 		UE_LOG(CaptainsLog, Error, TEXT("Cannot find PlayerControllerClass:%s"), tPlayerControllerName); //Log Error
 	}
+
+	Timeout = Swaptime;
+	PrimaryActorTick.bCanEverTick = true;
 
 	//UE_LOG(CaptainsLog, Error, TEXT("I am an error")); //Log Error
 	//UE_LOG(CaptainsLog, Warning, TEXT("I am an Warning")); //Log Warning
@@ -93,6 +95,25 @@ AUE43rdPersonCPPGameMode* AUE43rdPersonCPPGameMode::GetMyGameMode(AActor* myActo
 	return nullptr;
 }
 
+void AUE43rdPersonCPPGameMode::Tick(float DeltaTime)
+{
+
+	Super::Tick(DeltaTime);
+	Timeout -= DeltaTime;
+	if (Timeout <= 0.0f)
+	{
+		Timeout = Swaptime;
+		UE_LOG(CaptainsLog, Log, TEXT("Tick")); //Log Entry
+		CurrentActor = (CurrentActor + 1) % GetActorCount();
+		APlayerController3rdPerson* tController = GetControllerAtIndex(0);
+		AUE43rdPersonCPPCharacter* tActor = GetActorAtIndex(CurrentActor);
+		if (IsValid(tController) && IsValid(tActor))
+		{
+			tController->Possess(tActor);
+		}
+	}
+}
+
 //Helper function to get count of actors
 int AUE43rdPersonCPPGameMode::GetActorCount()
 {
@@ -102,9 +123,41 @@ int AUE43rdPersonCPPGameMode::GetActorCount()
 //Get the actor at a specified index (safe)
 AUE43rdPersonCPPCharacter* AUE43rdPersonCPPGameMode::GetActorAtIndex(int Index)
 {
-	if (Characters.Num() > Index) 
+	if (Characters.Num() > Index)
 	{
 		return	Characters[Index];
 	}
 	return nullptr;
 }
+
+
+
+
+void AUE43rdPersonCPPGameMode::AddController(APlayerController3rdPerson* Controller)
+{
+	Controllers.Add(Controller);
+	UE_LOG(CaptainsLog, Log, TEXT("AddController:%s Count %d"), *Controller->GetName(), GetControllerCount()); //Log Entry
+}
+
+void AUE43rdPersonCPPGameMode::RemoveController(APlayerController3rdPerson* Controller)
+{
+	Controllers.Remove(Controller);
+	UE_LOG(CaptainsLog, Log, TEXT("AddController:%s Count %d"), *Controller->GetName(), GetControllerCount()); //Log Entry
+}
+
+int AUE43rdPersonCPPGameMode::GetControllerCount()
+{
+	return Controllers.Num();
+}
+
+APlayerController3rdPerson* AUE43rdPersonCPPGameMode::GetControllerAtIndex(int Index)
+{
+	if (GetControllerCount() > Index)
+	{
+		return	Controllers[Index];
+	}
+	return nullptr;
+}
+
+
+

@@ -49,6 +49,26 @@ void APlayerController3rdPerson::SetupInputComponent()
 	}
 }
 
+void APlayerController3rdPerson::BeginPlay()
+{
+	Super::BeginPlay();
+	AUE43rdPersonCPPGameMode* tMyGameMode = AUE43rdPersonCPPGameMode::GetMyGameMode(this); //Use helper
+	if (IsValid(tMyGameMode))
+	{
+		tMyGameMode->AddController(this);
+	}
+}
+
+void APlayerController3rdPerson::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	AUE43rdPersonCPPGameMode* tMyGameMode = AUE43rdPersonCPPGameMode::GetMyGameMode(this); //Use helper
+	if (IsValid(tMyGameMode))
+	{
+		tMyGameMode->RemoveController(this);
+	}
+}
+
 //Pass to Character
 void APlayerController3rdPerson::Jump()
 {
